@@ -37,6 +37,10 @@ public:
 	vector <GameObject*> objects;
 	vector <Shader*> shaders;
 
+	vector<glm::vec3*>* initialPoints = new vector<glm::vec3*>();
+	vector<glm::vec3*>* resultPoints = new vector<glm::vec3*>();
+	vector<glm::vec3*>* initialCurve = new vector<glm::vec3*>();
+
 public:
 	System();
 	~System();
@@ -51,7 +55,15 @@ public:
 
 	void update();
 
+	void render();
+
+	void createCurve();
+
+	void addNewPoint(double x, double y);
+
 	static void MouseEvent(GLFWwindow* window, int button, int action, int mods);
+
+
 
 };
 

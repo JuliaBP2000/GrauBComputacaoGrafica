@@ -22,9 +22,9 @@ int System::GLFWInit()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+	/*glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);*/
 
 
 	//cria janela
@@ -44,6 +44,8 @@ int System::GLFWInit()
 
 	glewExperimental = GL_TRUE;
 
+	
+	
 	//inicia a glew
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Failed no init GLEW." << std::endl;
@@ -53,7 +55,6 @@ int System::GLFWInit()
 	glViewport(0, 0, screenWidth, screenHeight);
 
 	glfwSetMouseButtonCallback(window, MouseEvent);
-
 
 	return EXIT_SUCCESS;
 
@@ -125,26 +126,7 @@ void System::Run()
 
 		glfwPollEvents();
 
-#pragma region Input Handling
-
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
-		}
-
-#pragma endregion
-
-
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//coreShader.Use();
-
-		//coreShader.UseTexture("woodTexture");
-
-		//glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		//glBindVertexArray(0);
-
+		update();
 
 		glfwSwapBuffers(window);
 	}
@@ -170,7 +152,9 @@ void System::MouseEvent(GLFWwindow* window, int button, int action, int mods)
 			x = xpos;
 			y = ypos;
 
-			printf("[%f , %f] ", x, y);
+			std::cout << "Pontos antes divisão:" + (int)x + (int)y << std::endl;
+			
+			// printf("[%f , %f] ", x, y);
 
 		}
 
@@ -183,17 +167,90 @@ void System::update()
 {
 	/*if (keys[GLFW_KEY_ESCAPE]) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
+	}*/
 	if (x != 0.0 || y != 0.0)
 	{
-		objects[0]->newPoint(x, y);
+		
+
+		objects[0]->addNewPoint(x, y);
 		x = 0.0;
 		y = 0.0;
-	}*/
+	}
 	if (create)
 	{
-		objects[0]->newCurve();
+
+		//set initial points
+
+		// calculate other points
+
+		//make the final lap
+
+		//draw the curve
+
+		//add curve on a VBO
+		/*objects[0]->newCurve();
 		create = false;
-		draw = true;
+		draw = true;*/
 	}
+
+	
+}
+
+void System::createCurve() {
+	
+
+}
+
+void System::addNewPoint(double x, double y)
+{
+	double width = WIDTH / 2;
+	double height = HEIGHT/ 2;
+
+	if (x > width) {
+		x = ((x - width) / width);
+	}
+	else if (x == width) {
+		x = 0;
+	}
+	else {
+		x = -((width - x) / width);
+	}
+
+	if (y > height) {
+		y = ((y - height) / height) * (-1);
+	}
+	else if (y == height) {
+		y = 0;
+	}
+	else {
+		y = -((height - y) / height) * (-1);
+	}
+
+	glm::vec3* point = new glm::vec3(x, y, 0.0);
+
+	printf("Pontos apos divisão: [%f , %f]", x, y);
+
+	initialPoints->push_back(point);
+
+	if (x > 0.0 && y > 0.0) {
+		x += 0.5;
+		y += 0.5;
+	}
+	else if (x > 0.0 && y < 0.0) {
+		x += 0.5;
+		y -= 0.5;
+	}
+	else if (x < 0.0 && y < 0.0) {
+		x -= 0.5;
+		y -= 0.5;
+	}
+	else {
+		x -= 0.5;
+		y += 0.5;
+	}
+}
+
+void System::render() {
+	//draw triangles with shader
+
 }

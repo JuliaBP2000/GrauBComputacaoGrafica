@@ -18,10 +18,7 @@ int main() {
 	if (system.SystemSetup() != 0) {
 		return EXIT_FAILURE;
 	}
-
 	
-	
-
 	system.Run();
 
 	system.Finish();
