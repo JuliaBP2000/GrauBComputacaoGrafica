@@ -1,6 +1,10 @@
 #include "System.h"
 
 
+double x = 0.0, y = 0.0;
+bool create = false;
+bool draw = false;
+
 
 System::System()
 {
@@ -22,10 +26,13 @@ int System::GLFWInit()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
+
+	//cria janela
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Sabertooth", nullptr, nullptr);
 
 	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
 
+	//verifica se é criada
 	if (window == nullptr) {
 		std::cout << "Failed to create GLFW Window" << std::endl;
 		glfwTerminate();
@@ -37,12 +44,16 @@ int System::GLFWInit()
 
 	glewExperimental = GL_TRUE;
 
+	//inicia a glew
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Failed no init GLEW." << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	glViewport(0, 0, screenWidth, screenHeight);
+
+	glfwSetMouseButtonCallback(window, MouseEvent);
+
 
 	return EXIT_SUCCESS;
 
@@ -66,7 +77,7 @@ int System::OpenGLSetup()
 int System::SystemSetup()
 {
 
-	coreShader = Shader("Shaders/Core/core.vert", "Shaders/Core/core.frag");
+	coreShader = Shader("Shaders/Core/vertexShader.vert", "Shaders/Core/fragmentShader.frag");
 	coreShader.Use();
 
 	return EXIT_SUCCESS;
@@ -75,41 +86,40 @@ int System::SystemSetup()
 void System::Run()
 {
 
-	coreShader.Use();
-	coreShader.LoadTexture("images/woodTexture.jpg", "texture1", "woodTexture");
+	//coreShader.Use();
 
-	GLfloat vertices[] =
-	{
-		// Positions         // Textures
+	//GLfloat vertices[] =
+	//{
+	//	// Positions         // Textures
 
-		 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
-		 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // Bottom Right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
+	//	 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
+	//	 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // Bottom Right
+	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
 
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
-		-0.5f,  0.5f, 0.0f,   0.0f, 1.0f, // Top Left
-		 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
-	};
+	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
+	//	-0.5f,  0.5f, 0.0f,   0.0f, 1.0f, // Top Left
+	//	 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
+	//};
 
-	GLuint VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
+	//GLuint VBO, VAO;
+	//glGenVertexArrays(1, &VAO);
+	//glGenBuffers(1, &VBO);
 
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	glBindVertexArray(VAO);
+	//// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	//glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
+	//// Position attribute
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	//glEnableVertexAttribArray(0);
 
-	// Texture attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
+	//// Texture attribute
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	//glEnableVertexAttribArray(1);
 
-	glBindVertexArray(0); // Unbind VAO
+	//glBindVertexArray(0); // Unbind VAO
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -123,16 +133,17 @@ void System::Run()
 
 #pragma endregion
 
+
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		coreShader.Use();
+		//coreShader.Use();
 
-		coreShader.UseTexture("woodTexture");
+		//coreShader.UseTexture("woodTexture");
 
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		//glBindVertexArray(VAO);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		//glBindVertexArray(0);
 
 
 		glfwSwapBuffers(window);
@@ -146,4 +157,43 @@ void System::Finish()
 	coreShader.Delete();
 
 	glfwTerminate();
+}
+
+void System::MouseEvent(GLFWwindow* window, int button, int action, int mods)
+{
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+
+			double xpos, ypos;
+
+			glfwGetCursorPos(window, &xpos, &ypos);
+
+			x = xpos;
+			y = ypos;
+
+			printf("[%f , %f] ", x, y);
+
+		}
+
+		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+			create = true;
+		}
+}
+
+void System::update()
+{
+	/*if (keys[GLFW_KEY_ESCAPE]) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (x != 0.0 || y != 0.0)
+	{
+		objects[0]->newPoint(x, y);
+		x = 0.0;
+		y = 0.0;
+	}*/
+	if (create)
+	{
+		objects[0]->newCurve();
+		create = false;
+		draw = true;
+	}
 }

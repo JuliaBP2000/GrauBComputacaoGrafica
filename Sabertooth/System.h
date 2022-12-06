@@ -34,6 +34,8 @@ private:
 public:
 	GLFWwindow* window;
 	Shader coreShader;
+	vector <GameObject*> objects;
+	vector <Shader*> shaders;
 
 public:
 	System();
@@ -46,6 +48,10 @@ public:
 	void Run();
 
 	void Finish();
+
+	void update();
+
+	static void MouseEvent(GLFWwindow* window, int button, int action, int mods);
 
 };
 
