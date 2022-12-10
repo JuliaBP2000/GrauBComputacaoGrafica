@@ -5,12 +5,9 @@ double x = 0.0, y = 0.0;
 bool create = false;
 bool draw = false;
 
-
 System::System()
 {
 }
-
-
 System::~System()
 {
 }
@@ -22,13 +19,9 @@ int System::GLFWInit()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	/*glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_SAMPLES, 4);*/
-
 
 	//cria janela
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Sabertooth", nullptr, nullptr);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Editor de Curva", nullptr, nullptr);
 
 	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
 
@@ -44,8 +37,7 @@ int System::GLFWInit()
 
 	glewExperimental = GL_TRUE;
 
-	
-	
+		
 	//inicia a glew
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Failed no init GLEW." << std::endl;
@@ -60,84 +52,50 @@ int System::GLFWInit()
 
 }
 
-int System::OpenGLSetup()
-{
-
-	glEnable(GL_BLEND);	// Enables blending ( glBlendFunc )
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_DEPTH_TEST);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
-
-	return EXIT_SUCCESS;
-}
-
 int System::SystemSetup()
 {
+	//add shader
+	Shader* shader = new Shader("Shaders/Core/vertexShader.vert", "Shaders/Core/fragmentShader.frag");
+	shaders.push_back(shader);	
 
-	coreShader = Shader("Shaders/Core/vertexShader.vert", "Shaders/Core/fragmentShader.frag");
-	coreShader.Use();
+	//create obj reference
+	Object* obj = new Object();
+	objects.push_back(obj);
+	objects[objects.size() - 1]->setShader(shaders[shaders.size() - 1]);
 
+	//make mtl
+	MTLWriter MTLWriter;
+	MTLWriter.createMtlFile();
+
+	//make obj
+	OBJWriter OBJWriter;
+	OBJWriter.createOBJFile();
+	
 	return EXIT_SUCCESS;
 }
 
 void System::Run()
 {
-
-	//coreShader.Use();
-
-	//GLfloat vertices[] =
-	//{
-	//	// Positions         // Textures
-
-	//	 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
-	//	 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // Bottom Right
-	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
-
-	//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Bottom Left
-	//	-0.5f,  0.5f, 0.0f,   0.0f, 1.0f, // Top Left
-	//	 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Top Right
-	//};
-
-	//GLuint VBO, VAO;
-	//glGenVertexArrays(1, &VAO);
-	//glGenBuffers(1, &VBO);
-
-	//// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	//glBindVertexArray(VAO);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//// Position attribute
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-	//glEnableVertexAttribArray(0);
-
-	//// Texture attribute
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	//glEnableVertexAttribArray(1);
-
-	//glBindVertexArray(0); // Unbind VAO
-
 	while (!glfwWindowShouldClose(window)) {
 
 		glfwPollEvents();
 
 		update();
 
+		render();
+
 		glfwSwapBuffers(window);
 	}
 
+	for (int i = 0; i < objects.size(); i++)
+	{
+		shaders[i]->Delete();;
+	}
 
 }
 
 void System::Finish()
 {
-	coreShader.Delete();
-
 	glfwTerminate();
 }
 
@@ -152,7 +110,7 @@ void System::MouseEvent(GLFWwindow* window, int button, int action, int mods)
 			x = xpos;
 			y = ypos;
 
-			std::cout << "Pontos antes divisão:" + (int)x + (int)y << std::endl;
+			//td::cout << "Pontos antes divisão:" + (int)x + (int)y << std::endl;
 			
 			// printf("[%f , %f] ", x, y);
 
@@ -165,92 +123,31 @@ void System::MouseEvent(GLFWwindow* window, int button, int action, int mods)
 
 void System::update()
 {
-	/*if (keys[GLFW_KEY_ESCAPE]) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}*/
 	if (x != 0.0 || y != 0.0)
 	{
-		
-
+		//normaliza os pontos e adciona numa lista 
 		objects[0]->addNewPoint(x, y);
 		x = 0.0;
 		y = 0.0;
 	}
 	if (create)
 	{
-
-		//set initial points
-
-		// calculate other points
-
-		//make the final lap
-
-		//draw the curve
-
-		//add curve on a VBO
-		/*objects[0]->newCurve();
-		create = false;
-		draw = true;*/
-	}
-
-	
-}
-
-void System::createCurve() {
-	
-
-}
-
-void System::addNewPoint(double x, double y)
-{
-	double width = WIDTH / 2;
-	double height = HEIGHT/ 2;
-
-	if (x > width) {
-		x = ((x - width) / width);
-	}
-	else if (x == width) {
-		x = 0;
-	}
-	else {
-		x = -((width - x) / width);
-	}
-
-	if (y > height) {
-		y = ((y - height) / height) * (-1);
-	}
-	else if (y == height) {
-		y = 0;
-	}
-	else {
-		y = -((height - y) / height) * (-1);
-	}
-
-	glm::vec3* point = new glm::vec3(x, y, 0.0);
-
-	printf("Pontos apos divisão: [%f , %f]", x, y);
-
-	initialPoints->push_back(point);
-
-	if (x > 0.0 && y > 0.0) {
-		x += 0.5;
-		y += 0.5;
-	}
-	else if (x > 0.0 && y < 0.0) {
-		x += 0.5;
-		y -= 0.5;
-	}
-	else if (x < 0.0 && y < 0.0) {
-		x -= 0.5;
-		y -= 0.5;
-	}
-	else {
-		x -= 0.5;
-		y += 0.5;
+		objects[0]->startCurve();		
+		create = false;		
+		draw = true;		
 	}
 }
 
 void System::render() {
 	//draw triangles with shader
+	glClearColor(0.98f, 0.75f, 0.75f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glfwPollEvents();
 
+
+	if (draw)
+	{
+		objects[0]->draw(*shaders[0]);
+	}
 }
+

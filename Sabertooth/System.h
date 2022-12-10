@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <chrono>
 #include <math.h>
+#include <vector>
 
 // External Libs
 #include <GL\glew.h>
@@ -23,6 +24,9 @@
 #include "Shader.h"
 #include "AssetManager.h"
 #include "Time.h"
+#include "Object.h"
+#include "MTLWriter.h"
+
 
 class System
 {
@@ -33,20 +37,14 @@ private:
 
 public:
 	GLFWwindow* window;
-	Shader coreShader;
-	vector <GameObject*> objects;
-	vector <Shader*> shaders;
-
-	vector<glm::vec3*>* initialPoints = new vector<glm::vec3*>();
-	vector<glm::vec3*>* resultPoints = new vector<glm::vec3*>();
-	vector<glm::vec3*>* initialCurve = new vector<glm::vec3*>();
+	std::vector<Object*> objects;
+	std::vector <Shader*> shaders;
 
 public:
 	System();
 	~System();
 
 	int GLFWInit();
-	int OpenGLSetup();
 	int SystemSetup();
 
 	void Run();
@@ -56,10 +54,6 @@ public:
 	void update();
 
 	void render();
-
-	void createCurve();
-
-	void addNewPoint(double x, double y);
 
 	static void MouseEvent(GLFWwindow* window, int button, int action, int mods);
 

@@ -12,9 +12,6 @@ int main() {
 	if (system.GLFWInit() != 0) {
 		return EXIT_FAILURE;
 	}
-	if (system.OpenGLSetup() != 0) {
-		return EXIT_FAILURE;
-	}
 	if (system.SystemSetup() != 0) {
 		return EXIT_FAILURE;
 	}
